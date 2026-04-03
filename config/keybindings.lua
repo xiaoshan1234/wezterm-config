@@ -29,8 +29,8 @@ function M.apply(config)
         { key = "m", mods = "LEADER", action = act.Hide },
 
         -- ========== 标签页管理 ==========
-        { key = "n", mods = "LEADER", action = act.SpawnTab("CurrentPaneDomain") },
-        { key = "w", mods = "LEADER", action = act.CloseCurrentTab({ confirm = false }) },
+        { key = "n", mods = "CTRL", action = act.SpawnTab("CurrentPaneDomain") },
+        { key = "w", mods = "CTRL", action = act.CloseCurrentTab({ confirm = false }) },
         { key = "Tab", mods = "CTRL", action = act.ActivateTabRelative(1) },
         { key = "t", mods = "LEADER", action = act.EmitEvent("toggle-tab-bar") },
 
