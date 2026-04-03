@@ -72,7 +72,7 @@ end
 
 function M.apply(config)
     config.enable_tab_bar = true
-    config.tab_bar_at_bottom = true
+    config.tab_bar_at_bottom = false
     config.show_new_tab_button_in_tab_bar = true
     config.show_tab_index_in_tab_bar = true
     config.show_tabs_in_tab_bar = true
