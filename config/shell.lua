@@ -4,7 +4,11 @@ local M = {}
 
 function M.apply(config)
     if utils.is_windows() then
-        config.default_prog = { "pwsh", "--NoLogo" }
+        if utils.windows_command_exists("powershell") then
+            config.default_prog = { "powershell", "-NoLogo" }
+        else
+            config.default_prog = { "cmd.exe" }
+        end
     else
         -- Unix 系统：zsh → bash
         if utils.unix_command_exists("zsh") then
