@@ -27,21 +27,29 @@ local function pick_color(primary, fallback)
     return fallback
 end
 
--- 标签栏背景不透明度（1 = 完全不透明）；原先用全透明会显得「太透」
+-- 标签栏背景不透明度（1 = 完全不透明）
 local TAB_BAR_ALPHA = 1
 local TAB_BAR_HOVER_ALPHA = 1
+-- 相对页面 background 加深：darken 因子 0~1，越大越暗；悬停时再略加深一点
+local TAB_BAR_BG_DARKEN = 0.12
+local TAB_BAR_HOVER_EXTRA_DARKEN = 0.04
 
 ---@param scheme table|nil
 ---@param alpha number
-local function scheme_bg_with_alpha(scheme, alpha)
+---@param hover boolean|nil
+local function scheme_tab_bar_bg(scheme, alpha, hover)
     local hex = scheme and pick_color(scheme.background, "#1b1d2b") or "#1b1d2b"
+    local darken_f = TAB_BAR_BG_DARKEN
+    if hover then
+        darken_f = math.min(1, TAB_BAR_BG_DARKEN + TAB_BAR_HOVER_EXTRA_DARKEN)
+    end
     local ok, c = pcall(function()
-        return wezterm.color.parse(hex):adjust_alpha(alpha)
+        return wezterm.color.parse(hex):darken(darken_f):adjust_alpha(alpha)
     end)
     if ok and c then
         return c
     end
-    return string.format("rgba(27, 29, 43, %g)", alpha)
+    return string.format("rgba(22, 24, 36, %g)", alpha)
 end
 
 local function tab_bar_colors(config)
@@ -57,8 +65,8 @@ local function tab_bar_colors(config)
     elseif scheme.brights and scheme.brights[1] then
         inactive_fg = scheme.brights[1]
     end
-    local bar_bg = scheme_bg_with_alpha(scheme, TAB_BAR_ALPHA)
-    local hover_bg = scheme_bg_with_alpha(scheme, TAB_BAR_HOVER_ALPHA)
+    local bar_bg = scheme_tab_bar_bg(scheme, TAB_BAR_ALPHA, false)
+    local hover_bg = scheme_tab_bar_bg(scheme, TAB_BAR_HOVER_ALPHA, true)
 
     return {
         background = bar_bg,
@@ -119,7 +127,7 @@ function M.apply(config)
             return tab.active_pane.title
         end
 
-        local background = scheme_bg_with_alpha(scheme, hover and TAB_BAR_HOVER_ALPHA or TAB_BAR_ALPHA)
+        local background = scheme_tab_bar_bg(scheme, hover and TAB_BAR_HOVER_ALPHA or TAB_BAR_ALPHA, hover)
         local foreground = pick_color(scheme.foreground, "#c0c0c0")
         local index_color = foreground
         if scheme.ansi and scheme.ansi[5] then
