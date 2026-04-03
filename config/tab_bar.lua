@@ -27,13 +27,29 @@ local function pick_color(primary, fallback)
     return fallback
 end
 
+-- 标签栏背景不透明度（1 = 完全不透明）；原先用全透明会显得「太透」
+local TAB_BAR_ALPHA = 1
+local TAB_BAR_HOVER_ALPHA = 1
+
+---@param scheme table|nil
+---@param alpha number
+local function scheme_bg_with_alpha(scheme, alpha)
+    local hex = scheme and pick_color(scheme.background, "#1b1d2b") or "#1b1d2b"
+    local ok, c = pcall(function()
+        return wezterm.color.parse(hex):adjust_alpha(alpha)
+    end)
+    if ok and c then
+        return c
+    end
+    return string.format("rgba(27, 29, 43, %g)", alpha)
+end
+
 local function tab_bar_colors(config)
     local scheme = resolve_scheme(config)
     if not scheme then
         return nil
     end
 
-    local background = pick_color(scheme.background, "#1b1d2b")
     local foreground = pick_color(scheme.foreground, "#c0c0c0")
     local inactive_fg = foreground
     if scheme.ansi and scheme.ansi[8] then
@@ -41,18 +57,18 @@ local function tab_bar_colors(config)
     elseif scheme.brights and scheme.brights[1] then
         inactive_fg = scheme.brights[1]
     end
-    local transparent = "rgba(0,0,0,0)"
-    local hover_bg = "rgba(0,0,0,0.25)"
+    local bar_bg = scheme_bg_with_alpha(scheme, TAB_BAR_ALPHA)
+    local hover_bg = scheme_bg_with_alpha(scheme, TAB_BAR_HOVER_ALPHA)
 
     return {
-        background = transparent,
+        background = bar_bg,
         active_tab = {
-            bg_color = transparent,
+            bg_color = bar_bg,
             fg_color = foreground,
             intensity = "Bold",
         },
         inactive_tab = {
-            bg_color = transparent,
+            bg_color = bar_bg,
             fg_color = inactive_fg,
         },
         inactive_tab_hover = {
@@ -60,7 +76,7 @@ local function tab_bar_colors(config)
             fg_color = foreground,
         },
         new_tab = {
-            bg_color = transparent,
+            bg_color = bar_bg,
             fg_color = inactive_fg,
         },
         new_tab_hover = {
@@ -103,7 +119,7 @@ function M.apply(config)
             return tab.active_pane.title
         end
 
-        local background = hover and "rgba(0,0,0,0.25)" or "rgba(0,0,0,0)"
+        local background = scheme_bg_with_alpha(scheme, hover and TAB_BAR_HOVER_ALPHA or TAB_BAR_ALPHA)
         local foreground = pick_color(scheme.foreground, "#c0c0c0")
         local index_color = foreground
         if scheme.ansi and scheme.ansi[5] then
