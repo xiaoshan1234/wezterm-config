@@ -31,7 +31,7 @@ function M.apply(config)
         -- ========== 标签页管理 ==========
         { key = "n", mods = "LEADER", action = act.SpawnTab("CurrentPaneDomain") },
         { key = "w", mods = "LEADER", action = act.CloseCurrentTab({ confirm = false }) },
-        { key = "Tab", mods = "LEADER", action = act.ActivateTabRelative(1) },
+        { key = "Tab", mods = "CTRL", action = act.ActivateTabRelative(1) },
         { key = "t", mods = "LEADER", action = act.EmitEvent("toggle-tab-bar") },
 
         -- ========== 窗格分割 ==========
