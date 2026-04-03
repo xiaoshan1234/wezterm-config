@@ -12,7 +12,7 @@ function M.apply(config)
     config.webgpu_power_preference = "HighPerformance"
 
     -- 窗口透明度
-    config.window_background_opacity = 0.9
+    config.window_background_opacity = 0.95
 
     -- 背景图片（如需启用请取消注释）
     -- config.window_background_image = constants.CONFIG_DIR .. "/images/4.jpg"
