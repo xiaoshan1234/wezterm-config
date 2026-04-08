@@ -64,6 +64,7 @@ function M.apply(config)
             end),
           },
         -- ========== 搜索与命令 ==========
+        { key = "P", mods = "CTRL|SHIFT", action = act.ActivateCommandPalette },
         { key = "/", mods = "LEADER", action = act.Search("CurrentSelectionOrEmptyString") },
         {
             key = "p",
