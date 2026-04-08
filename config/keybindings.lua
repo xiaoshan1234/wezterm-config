@@ -115,6 +115,10 @@ function M.apply(config)
             }),
         },
 
+        -- ========== 剪贴板 ==========
+        { key = "Insert", mods = "SHIFT", action = act.PasteFrom("Clipboard") },
+        { key = "Delete", mods = "SHIFT", action = act.CopyTo("Clipboard") },
+
         -- ========== 远程粘贴（发送剪贴板内容到远程 Vim/Helix）==========
         -- Leader+v: 使用 Bracketed Paste 模式粘贴（适用于支持该模式的编辑器）
         {
