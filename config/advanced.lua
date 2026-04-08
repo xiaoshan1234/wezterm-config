@@ -2,7 +2,7 @@ local M = {}
 
 function M.apply(config)
     -- 滚动配置
-    config.enable_scroll_bar = false
+    config.enable_scroll_bar = true
     config.scrollback_lines = 20000
 
     -- 自动重载配置

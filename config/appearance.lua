@@ -25,9 +25,9 @@ function M.apply(config)
         bottom = 0,
     }
 
-    -- 滚动条颜色
+    -- 滚动条滑块（比背景明显一截，便于辨认）
     config.colors = config.colors or {}
-    config.colors.scrollbar_thumb = "#242936"
+    config.colors.scrollbar_thumb = "#7b8aad"
 
     -- 命令面板样式（磨砂深色）
     config.command_palette_bg_color = "rgba(12, 14, 20, 0.92)"
