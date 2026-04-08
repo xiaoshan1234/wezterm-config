@@ -7,7 +7,7 @@ function M.apply(config)
             remote_address = '10.18.0.20',
             username = 'liuhao',
             multiplexing = 'WezTerm',-- 关键：启用 WezTerm 多路复用（断网重连、会话持久）
-            remote_wezterm_path = '/home/liuhao/wezterm/usr/bin/wezterm-mux-server',
+            remote_wezterm_path = '/home/liuhao/wezterm/usr/bin/wezterm',
             -- connect_automatically = true,
         },
         {
@@ -15,7 +15,7 @@ function M.apply(config)
             remote_address = '10.18.0.25',
             username = 'liuhao',
             multiplexing = 'WezTerm',-- 关键：启用 WezTerm 多路复用（断网重连、会话持久）
-            remote_wezterm_path = '/home/liuhao/wezterm/usr/bin/wezterm-mux-server',
+            remote_wezterm_path = '/home/liuhao/wezterm/usr/bin/wezterm',
             -- connect_automatically = true,
         },
         {
