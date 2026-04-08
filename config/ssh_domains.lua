@@ -3,21 +3,27 @@ local M = {}
 function M.apply(config)
     config.ssh_domains = {
         {
-            name = "mint",
-            remote_address = "122.207.79.207:22",
-            username = "mint",
-            -- 如果需要可以指定私钥路径
-            -- ssh_option = { identityfile = "~/.ssh/id_rsa" },
+            name = '10.18.0.20',
+            remote_address = '10.18.0.20',
+            username = 'liuhao',
+            multiplexing = 'WezTerm',-- 关键：启用 WezTerm 多路复用（断网重连、会话持久）
+            remote_wezterm_path = '/home/liuhao/wezterm/usr/bin/wezterm-mux-server',
+            -- connect_automatically = true,
         },
         {
-            name = "linuxbrew",
-            remote_address = "122.207.79.207:22",
-            username = "linuxbrew",
+            name = '10.18.0.25',
+            remote_address = '10.18.0.25',
+            username = 'liuhao',
+            multiplexing = 'WezTerm',-- 关键：启用 WezTerm 多路复用（断网重连、会话持久）
+            remote_wezterm_path = '/home/liuhao/wezterm/usr/bin/wezterm-mux-server',
+            -- connect_automatically = true,
         },
         {
-            name = "software",
-            remote_address = "122.207.79.207:22",
-            username = "software",
+            name = 'xp',
+            remote_address = 'xp.xiaoshan12138.top',
+            username = 'loner',
+            multiplexing = 'WezTerm',-- 关键：启用 WezTerm 多路复用（断网重连、会话持久）
+            -- connect_automatically = true,
         },
     }
 end
