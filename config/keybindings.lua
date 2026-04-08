@@ -52,7 +52,17 @@ function M.apply(config)
 
         -- ========== 窗格关闭 ==========
         { key = "w", mods = "CTRL|SHIFT", action = act.CloseCurrentPane({ confirm = true }) },
-
+        {
+            key = "R",
+            mods = "CTRL|SHIFT",
+            action = wezterm.action_callback(function(window, pane)
+              -- 断开当前连接
+              pane:disconnect()
+              -- 重新连接当前域
+              local domain = window:active_tab():get_domain()
+              window:perform_action(wezterm.action.AttachDomain(domain.name), pane)
+            end),
+          },
         -- ========== 搜索与命令 ==========
         { key = "/", mods = "LEADER", action = act.Search("CurrentSelectionOrEmptyString") },
         {
