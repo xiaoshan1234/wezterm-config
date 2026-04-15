@@ -11,6 +11,7 @@ M.CONFIG_DIR = wezterm.config_dir
 
 -- Leader+s 配色选择器使用的内置/已知配色名（需与 WezTerm 内置或自定义 scheme 名一致）
 M.COLOR_SCHEMES = {
+    "Matrix Green",
     "Ayu Mirage",
     "Tokyo Night",
     "Catppuccin Mocha",
