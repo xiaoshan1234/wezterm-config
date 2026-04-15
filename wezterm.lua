@@ -17,6 +17,7 @@ local modules = {
     "config.tab_bar",
     "config.cursor",
     "config.ssh_domains",
+    "config.exec_domains",
     "config.launch",
     "config.events",
     "config.keybindings",
