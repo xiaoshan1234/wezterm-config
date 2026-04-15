@@ -14,7 +14,7 @@ local modules = {
     -- "config.fonts",
     "config.appearance",
     "config.window",
-    -- "config.tab_bar",
+    "config.tab_bar",
     "config.cursor",
     "config.ssh_domains",
     "config.launch",
