@@ -17,8 +17,8 @@ return {
 
     split = "#2a3540",
 
-    compose_cursor_bg = "#63d986",
-    compose_cursor_border = "#9ddcb0",
+    -- IME / Leader 等待组合输入时的光标色（Palette 仅支持 compose_cursor 单字段，见官方文档）
+    compose_cursor = "#9ddcb0",
 
     -- 8 色 ANSI：黑、红、绿、黄、蓝、洋红、青、白（程序 ls、dircolors、语法高亮等依赖）
     ansi = {
@@ -55,9 +55,5 @@ return {
     -- 响铃时边框闪烁色（橙红，与绿字区分明显）
     visual_bell = "#e07856",
 
-    -- QuickSelect / 快速选区：标签与匹配高亮（黄标 + 蓝底匹配块）
-    quick_select_label_fg = "#1a1208",
-    quick_select_label_bg = "#ffcb6b",
-    quick_select_match_fg = "#000000",
-    quick_select_match_bg = "#82aaff",
+    -- QuickSelect 颜色见 appearance.lua → config.colors（须 { Color = "#..." }，见该文件注释）
 }
