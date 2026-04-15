@@ -103,7 +103,7 @@ end
 
 function M.apply(config)
     config.enable_tab_bar = true
-    config.tab_bar_at_bottom = false
+    config.tab_bar_at_bottom = true
     config.show_new_tab_button_in_tab_bar = true
     config.show_tab_index_in_tab_bar = true
     config.show_tabs_in_tab_bar = true
@@ -139,6 +139,12 @@ function M.apply(config)
 
         local background = scheme_tab_bar_bg(scheme, hover and TAB_BAR_HOVER_ALPHA or TAB_BAR_ALPHA, hover)
         local foreground = pick_color(scheme.foreground, "#c0c0c0")
+        local inactive_fg = foreground
+        if scheme.ansi and scheme.ansi[8] then
+            inactive_fg = scheme.ansi[8]
+        elseif scheme.brights and scheme.brights[1] then
+            inactive_fg = scheme.brights[1]
+        end
         local index_color = foreground
         if scheme.ansi and scheme.ansi[5] then
             index_color = scheme.ansi[5]
@@ -153,14 +159,23 @@ function M.apply(config)
             title_color = "#e28a8a"
         end
 
-        return wezterm.format({
-            { Background = { Color = background } },
-            { Foreground = { Color = index_color } },
-            { Text = string.format(" %d:", tab.tab_index + 1) },
-            { Foreground = { Color = title_color } },
-            { Attribute = { Intensity = intensity } },
-            { Text = " " .. title .. " " },
-        })
+        -- 分隔符 | 使用次要前景色，与序号/标题区分
+        local sep_color = inactive_fg
+
+        local parts = {}
+        if tab.tab_index > 0 then
+            parts[#parts + 1] = { Background = { Color = background } }
+            parts[#parts + 1] = { Foreground = { Color = sep_color } }
+            parts[#parts + 1] = { Text = " | " }
+        end
+        parts[#parts + 1] = { Background = { Color = background } }
+        parts[#parts + 1] = { Foreground = { Color = index_color } }
+        parts[#parts + 1] = { Text = string.format(" %d:", tab.tab_index + 1) }
+        parts[#parts + 1] = { Foreground = { Color = title_color } }
+        parts[#parts + 1] = { Attribute = { Intensity = intensity } }
+        parts[#parts + 1] = { Text = " " .. title .. " " }
+
+        return wezterm.format(parts)
     end)
 end
 
