@@ -1,3 +1,7 @@
+--------------------------------------------------------------------------------
+-- SSH 域：WezTerm 内置多路连接；multiplexing 使用远端 wezterm 时可会话恢复
+--------------------------------------------------------------------------------
+
 local M = {}
 
 function M.apply(config)
@@ -6,7 +10,8 @@ function M.apply(config)
             name = '10.18.0.20',
             remote_address = '10.18.0.20',
             username = 'liuhao',
-            multiplexing = 'WezTerm',-- 关键：启用 WezTerm 多路复用（断网重连、会话持久）
+            -- 使用远端 WezTerm 多路复用：断线重连、图形区会话等（需远端已安装对应路径）
+            multiplexing = 'WezTerm',
             remote_wezterm_path = '/home/liuhao/wezterm/usr/bin/wezterm',
             -- connect_automatically = true,
         },
@@ -14,7 +19,7 @@ function M.apply(config)
             name = '10.18.0.25',
             remote_address = '10.18.0.25',
             username = 'liuhao',
-            multiplexing = 'WezTerm',-- 关键：启用 WezTerm 多路复用（断网重连、会话持久）
+            multiplexing = 'WezTerm',
             remote_wezterm_path = '/home/liuhao/wezterm/usr/bin/wezterm',
             -- connect_automatically = true,
         },
@@ -22,7 +27,7 @@ function M.apply(config)
             name = 'xp',
             remote_address = 'xp.xiaoshan12138.top',
             username = 'loner',
-            multiplexing = 'WezTerm',-- 关键：启用 WezTerm 多路复用（断网重连、会话持久）
+            multiplexing = 'WezTerm',
             -- connect_automatically = true,
         },
     }

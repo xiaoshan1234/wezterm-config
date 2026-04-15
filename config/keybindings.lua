@@ -1,3 +1,7 @@
+--------------------------------------------------------------------------------
+-- 键盘：禁用默认键、Leader、窗口/标签/分屏/搜索/配色/SSH 等自定义绑定
+--------------------------------------------------------------------------------
+
 local wezterm = require("wezterm")
 
 local constants = require("config.constants")
@@ -7,17 +11,17 @@ local M = {}
 function M.apply(config)
     local act = wezterm.action
 
-    -- 禁用默认快捷键
+    -- 全部改用下方 keys，避免与默认快捷键冲突或重复
     config.disable_default_key_bindings = true
 
-    -- Leader 键
+    -- Leader：先按 Ctrl+a，再在超时时间内按第二个键
     config.leader = {
         key = "a",
         mods = "CTRL",
         timeout_milliseconds = 1500,
     }
 
-    -- 构建配色方案选择器的选项
+    -- 与 constants.COLOR_SCHEMES 对应的下拉选项（仅 label，选中名即 color_scheme）
     local color_scheme_choices = {}
     for _, scheme in ipairs(constants.COLOR_SCHEMES) do
         table.insert(color_scheme_choices, { label = scheme })
@@ -56,9 +60,8 @@ function M.apply(config)
             key = "R",
             mods = "CTRL|SHIFT",
             action = wezterm.action_callback(function(window, pane)
-              -- 断开当前连接
+              -- 断开当前 SSH/域连接后重新挂到同一域（用于会话恢复场景）
               pane:disconnect()
-              -- 重新连接当前域
               local domain = window:active_tab():get_domain()
               window:perform_action(wezterm.action.AttachDomain(domain.name), pane)
             end),
@@ -132,7 +135,6 @@ function M.apply(config)
             key = "V",
             mods = "CTRL|SHIFT",
             action = wezterm.action_callback(function(window, pane)
-                -- 获取剪贴板内容并直接发送到终端
                 local clipboard = window:copy_clipboard("Clipboard")
                 if clipboard then
                     pane:send_text(clipboard)

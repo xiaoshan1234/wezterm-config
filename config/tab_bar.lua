@@ -1,7 +1,12 @@
+--------------------------------------------------------------------------------
+-- 标签栏：位置、宽度、与当前配色联动的 tab_bar 颜色与自定义标题格式
+--------------------------------------------------------------------------------
+
 local wezterm = require("wezterm")
 
 local M = {}
 
+--- 从当前 config 解析出正在使用的配色表（自定义或内置）
 local function resolve_scheme(config)
     if not config or not config.color_scheme then
         return nil
@@ -34,6 +39,7 @@ local TAB_BAR_HOVER_ALPHA = 1
 local TAB_BAR_BG_DARKEN = 0.12
 local TAB_BAR_HOVER_EXTRA_DARKEN = 0.04
 
+--- 根据配色 background 计算标签栏条/悬停条背景色
 ---@param scheme table|nil
 ---@param alpha number
 ---@param hover boolean|nil
@@ -52,6 +58,7 @@ local function scheme_tab_bar_bg(scheme, alpha, hover)
     return string.format("rgba(22, 24, 36, %g)", alpha)
 end
 
+--- 组装 config.colors.tab_bar 各子项颜色
 local function tab_bar_colors(config)
     local scheme = resolve_scheme(config)
     if not scheme then
@@ -102,6 +109,7 @@ function M.apply(config)
     config.show_tabs_in_tab_bar = true
     config.switch_to_last_active_tab_when_closing_tab = true
     config.tab_max_width = 25
+    -- false 使用非「仿 macOS」的简洁标签条，便于与 format-tab-title 配合
     config.use_fancy_tab_bar = false
 
     local colors = tab_bar_colors(config)
@@ -110,6 +118,7 @@ function M.apply(config)
         config.colors.tab_bar = colors
     end
 
+    -- 新建标签按钮上的「+」字符与悬停色
     config.tab_bar_style = {
         new_tab = wezterm.format({
             { Foreground = { Color = "#5fbf7d" } },
@@ -121,6 +130,7 @@ function M.apply(config)
         }),
     }
 
+    -- 每个标签标题：序号 + 进程标题；当前标签标题用强调色
     wezterm.on("format-tab-title", function(tab, _tabs, _panes, cfg, hover, _max_width)
         local scheme = resolve_scheme(cfg)
         if not scheme then

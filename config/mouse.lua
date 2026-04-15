@@ -1,3 +1,7 @@
+--------------------------------------------------------------------------------
+-- 鼠标：在默认绑定基础上追加选区复制、拖窗、Ctrl+点击打开链接
+--------------------------------------------------------------------------------
+
 local wezterm = require("wezterm")
 
 local M = {}
@@ -5,10 +9,11 @@ local M = {}
 function M.apply(config)
     local act = wezterm.action
 
+    -- 保留 WezTerm 自带鼠标行为，再叠加 mouse_bindings
     config.disable_default_mouse_bindings = false
 
     config.mouse_bindings = {
-        -- 左键点击：复制选中文本到剪贴板
+        -- 左键释放：将选区复制到剪贴板（与 CompleteSelection 语义一致）
         {
             event = { Up = { streak = 1, button = "Left" } },
             mods = "NONE",
@@ -66,13 +71,13 @@ function M.apply(config)
         --         )
         --     end),
         -- },
-        -- Ctrl+Alt+拖动：移动窗口
+        -- Ctrl+Alt+左键拖动：移动窗口
         {
             event = { Drag = { streak = 1, button = "Left" } },
             mods = "CTRL|ALT",
             action = act.StartWindowDrag,
         },
-        -- Ctrl+点击：打开超链接
+        -- Ctrl+左键释放：在光标处打开超链接
         {
             event = { Up = { streak = 1, button = "Left" } },
             mods = "CTRL",
