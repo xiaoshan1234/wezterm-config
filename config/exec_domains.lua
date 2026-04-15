@@ -1,25 +1,19 @@
 --------------------------------------------------------------------------------
 -- ExecDomain：在本机起进程前用 fixup 包一层命令（WSL / systemd 等）
 -- 文档：https://wezterm.org/config/lua/ExecDomain.html
+-- EXEC_DOMAIN_SPECS 供 config.launch 生成启动菜单项（与域 name 一致）
 --------------------------------------------------------------------------------
 
 local wezterm = require("wezterm")
 
-local utils = require("config.utils")
-
 local M = {}
 
-local function basename(s)
-    return (string.gsub(s, "(.*[/\\])(.*)", "%2"))
-end
-
-function M.apply(config)
-    local domains = {}
-
-    -- 本机起 ssh：连上即 tmux -CC attach（不走 ssh_domains；需 PATH 中有 ssh）
-    table.insert(
-        domains,
-        wezterm.exec_domain("tmux-diag-cmd-nb", function(cmd)
+---@type table[] name / label / fixup；可选 when = function(): boolean
+M.EXEC_DOMAIN_SPECS = {
+    {
+        name = "tmux-diag-cmd-nb",
+        label = "🔌 10.18.0.20 · tmux -CC diag-cmd-nb",
+        fixup = function(cmd)
             cmd.args = {
                 "ssh",
                 "-t",
@@ -32,13 +26,21 @@ function M.apply(config)
                 "diag-cmd-nb",
             }
             return cmd
-        end, "🔌 10.18.0.20 · tmux -CC diag-cmd-nb")
-    )
+        end,
+    },
+}
 
+function M.apply(config)
+    local domains = {}
+    for _, spec in ipairs(M.EXEC_DOMAIN_SPECS) do
+        if spec.when == nil or spec.when() then
+            table.insert(domains, wezterm.exec_domain(spec.name, spec.fixup, spec.label))
+        end
+    end
     config.exec_domains = domains
 
     -- 若希望默认新标签即进某 ExecDomain，取消下一行注释并改成域 name：
-    -- config.default_domain = "wsl-debian"
+    -- config.default_domain = "tmux-diag-cmd-nb"
 end
 
 return M
