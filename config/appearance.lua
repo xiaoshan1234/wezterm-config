@@ -7,8 +7,11 @@ local constants = require("config.constants")
 local M = {}
 
 function M.apply(config)
-    -- 默认配色（也可由快捷键临时覆盖）
-    config.color_scheme = 'Ayu Mirage'
+    config.color_schemes = config.color_schemes or {}
+    config.color_schemes["Matrix Green"] = require("color.scheme_matrix_green")
+
+    -- 默认配色（Leader+s 可切换；自定义见 config/scheme_matrix_green.lua）
+    config.color_scheme = "Matrix Green"
 
     -- 前端与帧率：WebGpu + 高性能 GPU 偏好
     config.max_fps = 120
@@ -16,7 +19,7 @@ function M.apply(config)
     config.webgpu_power_preference = "HighPerformance"
 
     -- 整个窗口背景不透明度（1 为不透明）
-    config.window_background_opacity = 1
+    config.window_background_opacity = 0.90
 
     -- 静态背景图（与 background.lua 二选一或按需启用其一）
     -- config.window_background_image = constants.CONFIG_DIR .. "/images/4.jpg"
@@ -29,13 +32,19 @@ function M.apply(config)
         bottom = 0,
     }
 
-    -- 滚动条拇指颜色（在配色上略提亮，便于辨认）
+    -- 滚动条拇指（滑块颜色）
     config.colors = config.colors or {}
-    config.colors.scrollbar_thumb = "#7b8aad"
+    config.colors.scrollbar_thumb = "#ffffff"
 
-    -- 命令面板（Ctrl+Shift+P 等）前景/背景
-    config.command_palette_bg_color = "rgba(12, 14, 20, 0.92)"
-    config.command_palette_fg_color = "#e6e9ef"
+    -- QuickSelect：须用 ColorSpec 表，不能写在 color_schemes 里当纯 hex
+    config.colors.quick_select_label_fg = { Color = "#2a2010" }
+    config.colors.quick_select_label_bg = { Color = "#ffcb6b" }
+    config.colors.quick_select_match_fg = { Color = "#000000" }
+    config.colors.quick_select_match_bg = { Color = "#82aaff" }
+
+    -- 命令面板（Ctrl+Shift+P 等）
+    config.command_palette_bg_color = "rgba(0, 12, 6, 0.94)"
+    config.command_palette_fg_color = "#a8d8b8"
 end
 
 return M
