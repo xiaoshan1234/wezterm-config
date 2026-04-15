@@ -11,23 +11,21 @@ function M.apply(config)
             remote_address = '10.18.0.20',
             username = 'liuhao',
             -- 使用远端 WezTerm 多路复用：断线重连、图形区会话等（需远端已安装对应路径）
-            multiplexing = 'WezTerm',
-            remote_wezterm_path = '/home/liuhao/wezterm/usr/bin/wezterm',
+            multiplexing = 'None',
             -- connect_automatically = true,
         },
         {
             name = '10.18.0.25',
             remote_address = '10.18.0.25',
             username = 'liuhao',
-            multiplexing = 'WezTerm',
-            remote_wezterm_path = '/home/liuhao/wezterm/usr/bin/wezterm',
+            multiplexing = 'None',
             -- connect_automatically = true,
         },
         {
             name = 'xp',
             remote_address = 'xp.xiaoshan12138.top',
             username = 'loner',
-            multiplexing = 'WezTerm',
+            multiplexing = 'None',
             -- connect_automatically = true,
         },
     }
