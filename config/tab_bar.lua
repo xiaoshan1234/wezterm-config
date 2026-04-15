@@ -310,7 +310,7 @@ function M.apply(config)
         }),
     }
 
-    -- 每个标签标题：序号 + 进程标题；当前标签标题用强调色
+    -- 每个标签标题：序号（从 0）+ 进程标题；当前标签标题用强调色
     wezterm.on("format-tab-title", function(tab, _tabs, _panes, cfg, hover, _max_width)
         local scheme = resolve_scheme(cfg)
         if not scheme then
@@ -350,7 +350,7 @@ function M.apply(config)
         end
         parts[#parts + 1] = { Background = { Color = background } }
         parts[#parts + 1] = { Foreground = { Color = index_color } }
-        parts[#parts + 1] = { Text = string.format(" %d:", tab.tab_index + 1) }
+        parts[#parts + 1] = { Text = string.format(" %d:", tab.tab_index) }
         parts[#parts + 1] = { Foreground = { Color = title_color } }
         parts[#parts + 1] = { Attribute = { Intensity = intensity } }
         parts[#parts + 1] = { Text = " " .. title .. " " }
