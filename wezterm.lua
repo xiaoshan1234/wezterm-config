@@ -11,14 +11,13 @@ local wezterm = require("wezterm")
 local config = wezterm.config_builder()
 
 local modules = {
-    "config.fonts",
+    -- "config.fonts",
     "config.appearance",
     "config.window",
-    "config.tab_bar",
+    -- "config.tab_bar",
     "config.cursor",
-    "config.shell",
     "config.ssh_domains",
-    "config.launch_menu",
+    "config.launch",
     "config.events",
     "config.keybindings",
     "config.mouse",
