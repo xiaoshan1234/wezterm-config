@@ -12,7 +12,7 @@ local M = {}
 M.EXEC_DOMAIN_SPECS = {
     {
         name = "tmux-diag-cmd-nb",
-        label = "🔌 10.18.0.20 · tmux -CC diag-cmd-nb",
+        label = "10.18.0.20 · tmux -CC diag-cmd-nb",
         fixup = function(cmd)
             cmd.args = {
                 "ssh",
@@ -24,6 +24,24 @@ M.EXEC_DOMAIN_SPECS = {
                 "attach",
                 "-t",
                 "diag-cmd-nb",
+            }
+            return cmd
+        end,
+    },
+    {
+        name = "tmux-diag-cmd-nb",
+        label = "🔌 10.18.0.20 · tmux -CC opencode",
+        fixup = function(cmd)
+            cmd.args = {
+                "ssh",
+                "-t",
+                "liuhao@10.18.0.20",
+                "--",
+                "tmux",
+                "-CC",
+                "attach",
+                "-t",
+                "opencode",
             }
             return cmd
         end,
