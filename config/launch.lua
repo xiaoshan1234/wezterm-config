@@ -1,16 +1,41 @@
 --------------------------------------------------------------------------------
--- 启动菜单：固定项 + 自动从 ssh_domains / exec_domains 规格生成「走某域」的项
--- SpawnCommand 的 domain 见：https://wezterm.org/config/lua/SpawnCommand.html
--- （与 keybindings 里 Leader+p / Leader+Space 等关联）
+-- 启动菜单：自动从 wsl_domains / ssh_domains / exec_domains 生成「走某域」的项
+-- WSL：未单独配置 wsl_domains 时用 wezterm.default_wsl_domains()（解析 wsl -l -v）
+-- SpawnCommand 的 domain：https://wezterm.org/config/lua/SpawnCommand.html
+-- default_wsl_domains：https://wezterm.org/config/lua/wezterm/default_wsl_domains.html
 --------------------------------------------------------------------------------
 
+local wezterm = require("wezterm")
 local utils = require("config.utils")
 local exec_domains = require("config.exec_domains")
 
 local M = {}
 
 function M.apply(config)
-    local launch_menu = {}
+    local launch_menu = {
+          { label = "bash",           args = { "C:\\Program Files\\Git\\bin\\bash.exe", "-l" } },
+          { label = "powerShell",     args = { "powershell.exe", "-NoLogo" } },
+          { label = "cmd",            args = { "cmd.exe"} },
+    }
+
+    -- Windows：注册 WSL 域（与官方默认一致，name 形如 WSL:debian），并写入启动菜单
+    if utils.is_windows() then
+        if not config.wsl_domains or #config.wsl_domains == 0 then
+            local ok, domains = pcall(wezterm.default_wsl_domains)
+            if ok and domains then
+                config.wsl_domains = domains
+            else
+                config.wsl_domains = {}
+            end
+        end
+        for _, w in ipairs(config.wsl_domains or {}) do
+            local label = w.name or ("WSL:" .. (w.distribution or "?"))
+            table.insert(launch_menu, {
+                label = "🐧 " .. label,
+                domain = { DomainName = w.name },
+            })
+        end
+    end
 
     -- 与 config.ssh_domains 同步（需在 wezterm.lua 中先于本模块应用 ssh_domains）
     for _, d in ipairs(config.ssh_domains or {}) do
