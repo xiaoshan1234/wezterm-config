@@ -90,9 +90,57 @@ local function looks_like_generic_ssh_title(s)
     return false
 end
 
---- 非 tmux 域下，把空/泛 WezTerm/字面「ssh」标题换成域短名（含 ssh_domains.name 如 10.18.0.20、xp）
+--- GUI 默认 mux 域，不能当「SSH 主机名」展示（否则标签会变成 local）
+local function is_reserved_mux_domain(domain)
+    local l = (domain or ""):lower()
+    return l == "local" or l == "default"
+end
+
+--- domain 为 local 时，从 pane 标题 / 窗口标题推断 SSH 目标（user@host、主机名等）
+local function ssh_target_from_pane(pane, tab)
+    local function pick_user_at_host(s)
+        if not s or s == "" then
+            return nil
+        end
+        s = strip_wezterm_title_noise(s)
+        local uat = s:match("([%w_%-%.]+@[%w_%-%.:]+)")
+        if uat and not uat:lower():match("^wezterm@") then
+            return uat
+        end
+        local rest = s:match("ssh%.exe%s+(.+)$") or s:match("^ssh%s+(.+)$")
+        if rest then
+            rest = rest:gsub("^%s+", ""):gsub("%s+$", "")
+            local u = rest:match("^([%w_%-%.]+@[%w_%-%.:]+)")
+            if u then
+                return u
+            end
+            local p_host = rest:match("^%-p%s+%d+%s+([%w_%-%.:]+)")
+            if p_host then
+                return p_host
+            end
+            local first = rest:match("^([%w_%-%.%:]+)")
+            if first and not first:match("^%-") then
+                return first
+            end
+        end
+        return nil
+    end
+
+    if pane then
+        local t = pick_user_at_host(pane.title or "")
+        if t then
+            return t
+        end
+    end
+    if tab and tab.window_title then
+        return pick_user_at_host(tab.window_title)
+    end
+    return nil
+end
+
+--- 非 tmux、且非 local/default 域：用 ssh_domains.name 或 SSHMUX: 短名替换泛标题
 local function prefer_ssh_name_when_placeholder(text, domain)
-    if domain == "" or domain:lower():find("tmux", 1, true) then
+    if domain == "" or domain:lower():find("tmux", 1, true) or is_reserved_mux_domain(domain) then
         return text
     end
     local short = ssh_domain_display_name(domain)
@@ -108,6 +156,21 @@ local function prefer_ssh_name_when_placeholder(text, domain)
     return text
 end
 
+--- local 域下：泛标题时用 ssh_target_from_pane，否则保持原文
+local function prefer_ssh_target_when_local_domain(text, domain, pane, tab)
+    if not is_reserved_mux_domain(domain) then
+        return text
+    end
+    if text and text ~= "" and not looks_like_generic_host_title(text) and not looks_like_generic_ssh_title(text) then
+        return text
+    end
+    local target = ssh_target_from_pane(pane, tab)
+    if target and target ~= "" then
+        return target
+    end
+    return text
+end
+
 --- 标签栏展示用标题：优先显式 tab 标题（tmux 窗口名常在这里），再清理后的 pane 标题，最后退回域/占位
 local function tab_label_for_display(tab)
     local pane = tab.active_pane
@@ -117,6 +180,7 @@ local function tab_label_for_display(tab)
     if from_tab and from_tab:match("%S") then
         local cleaned = strip_wezterm_title_noise(from_tab)
         cleaned = prefer_ssh_name_when_placeholder(cleaned, domain)
+        cleaned = prefer_ssh_target_when_local_domain(cleaned, domain, pane, tab)
         if cleaned ~= "" then
             return cleaned
         end
@@ -124,6 +188,7 @@ local function tab_label_for_display(tab)
 
     local from_pane = strip_wezterm_title_noise((pane and pane.title) or "")
     from_pane = prefer_ssh_name_when_placeholder(from_pane, domain)
+    from_pane = prefer_ssh_target_when_local_domain(from_pane, domain, pane, tab)
     if from_pane ~= "" and not looks_like_generic_host_title(from_pane) and not looks_like_generic_ssh_title(from_pane) then
         return from_pane
     end
@@ -133,6 +198,13 @@ local function tab_label_for_display(tab)
         local d = domain
         if d:lower():find("tmux", 1, true) then
             return "tmux · " .. d
+        end
+        if is_reserved_mux_domain(d) then
+            local t = ssh_target_from_pane(pane, tab)
+            if t and t ~= "" then
+                return t
+            end
+            return from_pane ~= "" and from_pane or "·"
         end
         return ssh_domain_display_name(d) or d
     end
