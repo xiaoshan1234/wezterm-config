@@ -11,7 +11,7 @@ local M = {}
 ---@type table[] name / label / fixup；可选 when = function(): boolean
 M.EXEC_DOMAIN_SPECS = {
     {
-        name = "tmux-diag-cmd-nb",
+        name = "diag-cmd-nb",
         label = "10.18.0.20 · tmux -CC diag-cmd-nb",
         fixup = function(cmd)
             cmd.args = {
@@ -29,7 +29,7 @@ M.EXEC_DOMAIN_SPECS = {
         end,
     },
     {
-        name = "tmux-diag-cmd-kg",
+        name = "diag-cmd-kg",
         label = "10.18.0.20 · tmux -CC diag-cmd-kg",
         fixup = function(cmd)
             cmd.args = {
