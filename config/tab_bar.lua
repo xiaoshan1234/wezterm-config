@@ -32,6 +32,114 @@ local function pick_color(primary, fallback)
     return fallback
 end
 
+--- 去掉标题里常见的 WezTerm 占位文案，便于露出 tmux/远端 真实窗口名
+local function strip_wezterm_title_noise(s)
+    if not s or s == "" then
+        return ""
+    end
+    local t = s
+    t = t:gsub("^%s+", ""):gsub("%s+$", "")
+    t = t:gsub("^WezTerm%s*[|%s%-]*", "")
+    t = t:gsub("^wezterm%s*[|%s%-]*", "")
+    t = t:gsub("^WezTerm%.app%s*", "")
+    t = t:gsub("^wezterm%-gui%.exe%s*", "")
+    t = t:gsub("^wezterm%.exe%s*", "")
+    t = t:gsub("%s*[%-|%s]+%s*[Ww]ez[Tt]erm%s*$", "")
+    t = t:gsub("^%s+", ""):gsub("%s+$", "")
+    return t
+end
+
+--- 判断是否仍是「只有 WezTerm / 可执行文件名」这类无区分标题
+local function looks_like_generic_host_title(s)
+    local l = (s or ""):lower():gsub("^%s+", ""):gsub("%s+$", "")
+    if l == "" then
+        return true
+    end
+    if l == "wezterm" or l == "wezterm-gui" or l == "wezterm.exe" or l == "wezterm-gui.exe" then
+        return true
+    end
+    if l:match("^wezterm") and #l <= 16 then
+        return true
+    end
+    return false
+end
+
+--- SSH 域在标签上展示的短名：去掉 SSHMUX: / SSH: 等前缀，与 ssh_domains 里 name 对齐
+local function ssh_domain_display_name(domain)
+    if not domain or domain == "" then
+        return nil
+    end
+    if domain:match("^SSHMUX:") then
+        return domain:gsub("^SSHMUX:", "")
+    end
+    if domain:match("^SSH:") then
+        return domain:gsub("^SSH:", "")
+    end
+    return domain
+end
+
+--- 仅「ssh」占位类标题，应用域名替换；有实质内容（如 vim、路径）则保留
+local function looks_like_generic_ssh_title(s)
+    local l = (s or ""):lower():gsub("^%s+", ""):gsub("%s+$", "")
+    if l == "ssh" or l == "ssh.exe" then
+        return true
+    end
+    if l == "wezterm ssh" then
+        return true
+    end
+    return false
+end
+
+--- 非 tmux 域下，把空/泛 WezTerm/字面「ssh」标题换成域短名（含 ssh_domains.name 如 10.18.0.20、xp）
+local function prefer_ssh_name_when_placeholder(text, domain)
+    if domain == "" or domain:lower():find("tmux", 1, true) then
+        return text
+    end
+    local short = ssh_domain_display_name(domain)
+    if not short or short == "" then
+        return text
+    end
+    if text == nil or text == "" then
+        return short
+    end
+    if looks_like_generic_host_title(text) or looks_like_generic_ssh_title(text) then
+        return short
+    end
+    return text
+end
+
+--- 标签栏展示用标题：优先显式 tab 标题（tmux 窗口名常在这里），再清理后的 pane 标题，最后退回域/占位
+local function tab_label_for_display(tab)
+    local pane = tab.active_pane
+    local domain = (pane and pane.domain_name) or ""
+
+    local from_tab = tab.tab_title
+    if from_tab and from_tab:match("%S") then
+        local cleaned = strip_wezterm_title_noise(from_tab)
+        cleaned = prefer_ssh_name_when_placeholder(cleaned, domain)
+        if cleaned ~= "" then
+            return cleaned
+        end
+    end
+
+    local from_pane = strip_wezterm_title_noise((pane and pane.title) or "")
+    from_pane = prefer_ssh_name_when_placeholder(from_pane, domain)
+    if from_pane ~= "" and not looks_like_generic_host_title(from_pane) and not looks_like_generic_ssh_title(from_pane) then
+        return from_pane
+    end
+
+    -- tmux -CC 等：pane 标题常仍是 WezTerm，用域名片段区分多会话
+    if domain ~= "" then
+        local d = domain
+        if d:lower():find("tmux", 1, true) then
+            return "tmux · " .. d
+        end
+        return ssh_domain_display_name(d) or d
+    end
+
+    return from_pane ~= "" and from_pane or "·"
+end
+
 -- 标签栏背景不透明度（1 = 完全不透明）
 local TAB_BAR_ALPHA = 1
 local TAB_BAR_HOVER_ALPHA = 1
@@ -152,7 +260,7 @@ function M.apply(config)
             index_color = scheme.brights[5]
         end
 
-        local title = tab.active_pane.title or ""
+        local title = tab_label_for_display(tab)
         local intensity = tab.is_active and "Bold" or "Normal"
         local title_color = foreground
         if tab.is_active then
