@@ -38,6 +38,7 @@ M.EXEC_DOMAIN_SPECS = {
                 "liuhao@10.18.0.20",
                 "--",
                 "tmux",
+                "-CC",
                 "attach",
                 "-t",
                 "diag-cmd-kg",
